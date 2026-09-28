@@ -1,36 +1,38 @@
-from flask import Flask, render_template, request
-import os
-import requests
+import os, requests
+from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# STUDENT INFO
-MY_NAME = "Sanjana Islam Orthy"
-MY_STUDENT_ID = "2026512866"
+HTML = """[your existing HTML - keep same]"""
+# OR just keep your old HTML, only replace the Python function below
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+def ask_gemini(question):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return "ERROR: GEMINI_API_KEY not set."
 
-@app.route("/", methods=["GET", "POST"])
+    models = ["gemini-2.5-flash", "gemini-1.5-flash-latest", "gemini-pro"]
+    for model in models:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+            data = {"contents": [{"parts": [{"text": question}]}]}
+            r = requests.post(url, json=data, timeout=20)
+            j = r.json()
+            if "candidates" in j:
+                return j["candidates"][0]["content"]["parts"][0]["text"]
+        except:
+            continue
+    return f"AI API Error: {j}"
+
+@app.route("/", methods=["GET","POST"])
 def home():
     answer = ""
-    question = ""
     if request.method == "POST":
-        question = request.form.get("question", "")
-        if not GEMINI_API_KEY:
-            answer = "⚠️ ERROR: GEMINI_API_KEY not set. Go to Render Dashboard > Environment > Add your Gemini API key."
-        elif question:
-            try:
-                # Using external AI API token here
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-                payload = {"contents": [{"parts": [{"text": question}]}]}
-                resp = requests.post(url, json=payload, timeout=30)
-                data = resp.json()
-                answer = data['candidates'][0]['content']['parts'][0]['text']
-            except Exception as e:
-                answer = f"AI API Error: {e}"
-    return render_template("index.html", name=MY_NAME, sid=MY_STUDENT_ID, answer=answer, question=question)
+        q = request.form.get("question","")
+        answer = ask_gemini(q)
+    # render your existing page with answer
+    return render_template_string(open("templates/index.html").read() if os.path.exists("templates/index.html") else HTML, answer=answer)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",10000)))
     
