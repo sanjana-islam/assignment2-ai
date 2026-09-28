@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Cloud Service - Sanjana Islam Orthy</title>
+<style>
+body{font-family:Arial;max-width:750px;margin:30px auto;padding:15px;background:#f6f8fb}
+.card{background:white;padding:28px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.info{background:#e8f0fe;border-left:5px solid #1a73e8;padding:14px;border-radius:8px;margin-bottom:20px}
+h2{color:#1a73e8;margin-top:0}
+input{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box}
+button{background:#1a73e8;color:white;border:none;padding:12px 22px;border-radius:8px;font-weight:600;cursor:pointer;margin-top:10px}
+button:hover{background:#1557b0}
+.ans{margin-top:20px;background:#f1f3f4;padding:16px;border-radius:10px;white-space:pre-wrap}
+.footer{font-size:11px;color:#888;margin-top:25px;text-align:center}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Render-based Cloud Service with AI Feature</h2>
+<div class="info">
+<b>Name:</b> {{name}}<br>
+<b>Student ID:</b> {{sid}}<br>
+<b>Assignment:</b> Cloud Computing - Assignment 2 (Due: 28 Sept 2026)
+</div>
+<h3>AI Feature: Ask Anything - Powered by Google Gemini</h3>
+<form method="POST">
+<input type="text" name="question" placeholder="Ask anything, e.g., What is Render?" value="{{question}}" required>
+<button type="submit">Ask AI</button>
+</form>
+{% if answer %}<div class="ans"><b>AI Answer:</b><br>{{answer}}</div>{% endif %}
+<div class="footer">This AI feature uses external API token: GEMINI_API_KEY (Google Gemini API gemini-1.5-flash)<br>Deployed on Render.com Free Tier</div>
+</div>
+</body>
+</html>
