@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import os
 import requests
+
 app = Flask(__name__)
 
 # STUDENT INFO
@@ -18,13 +19,14 @@ def home():
             answer = "⚠️ ERROR: GEMINI_API_KEY not set. Go to Render Dashboard > Environment > Add your Gemini API key."
         elif question:
             try:
-                # FIXED MODEL: 1.5 is removed, using 2.0-flash
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+                # LATEST MODEL - gemini-3.8-flash (2.0 is no longer available)
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_API_KEY}"
                 payload = {"contents": [{"parts": [{"text": question}]}]}
-                resp = requests.post(url, json=payload, timeout=30)
+                headers = {"Content-Type": "application/json"}
+
+                resp = requests.post(url, json=payload, headers=headers, timeout=30)
                 data = resp.json()
 
-                # Better error handling
                 if 'candidates' in data and len(data['candidates']) > 0:
                     answer = data['candidates'][0]['content']['parts'][0]['text']
                 else:
@@ -32,6 +34,7 @@ def home():
 
             except Exception as e:
                 answer = f"AI API Error: {e}"
+
     return render_template("index.html", name=MY_NAME, sid=MY_STUDENT_ID, answer=answer, question=question)
 
 if __name__ == "__main__":
